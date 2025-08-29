@@ -7,7 +7,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 
-def scrape_all_titles():
+def reddit_title_scraper():
     # Setup Chrome options to run in headless mode (no UI)
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -39,8 +39,10 @@ def scrape_all_titles():
 
     # Now, parse the content with BeautifulSoup
     soup = BeautifulSoup(content, 'html.parser')
-    print(soup.prettify())
 
+    blocked = soup.find_all('div', class_='font-bold text-24 text-neutral-content-strong')
+    if len(blocked) > 0:
+        print('Blocked by reddit network security')
     # Use a generic selector that is likely to be stable
     # The new selector is likely a class or data attribute on the title elements
     all_titles = soup.find_all('a', attrs={'slot': 'title'})
