@@ -3,6 +3,7 @@ import asyncio
 
 from dotenv import load_dotenv
 
+from csv_output import format_would_you_rather_strings
 from scraper import scraper
 
 load_dotenv()
@@ -19,6 +20,7 @@ async def print_hi(name):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    scraper.reddit_title_scraper()
+    all_titles = scraper.reddit_title_scraper()
+    format_would_you_rather_strings(all_titles, "wyr_test.csv")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
