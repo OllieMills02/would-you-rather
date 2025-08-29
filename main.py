@@ -1,7 +1,11 @@
 # This is a sample Python script.
 import asyncio
 
+from dotenv import load_dotenv
+
 from scraper import scraper
+
+load_dotenv()
 
 
 # Press ⌃R to execute it or replace it with your code.

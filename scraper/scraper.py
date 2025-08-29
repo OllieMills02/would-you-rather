@@ -1,17 +1,15 @@
 import os
-
 import praw
 
 
 def reddit_title_scraper():
-
     reddit = praw.Reddit(
-        client_id=os.getenv("PRAW_CLIENT_ID"),
-        client_secret=os.getenv("PRAW_CLIENT_SECRET"),
-        user_agent=os.getenv("PRAW_USER_AGENT"),
+        client_id=os.environ["PRAW_CLIENT_ID"],
+        client_secret=os.environ["PRAW_CLIENT_SECRET"],
+        user_agent=os.environ["PRAW_USER_AGENT"],
     )
     subreddit_name = "WouldYouRather"
-    pages_to_scrape = 100
+    pages_to_scrape = 5
     posts_per_page = 100
 
     all_titles = []
@@ -23,6 +21,7 @@ def reddit_title_scraper():
         for post in posts:
             all_titles.append(post.title)
 
+    print(f"Found {len(all_titles)} posts")
     for title in all_titles:
         print(title)
 
