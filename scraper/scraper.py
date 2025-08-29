@@ -1,56 +1,30 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from bs4 import BeautifulSoup
-import time
-from webdriver_manager.chrome import ChromeDriverManager
+import os
 
+import praw
 
 
 def reddit_title_scraper():
-    # Setup Chrome options to run in headless mode (no UI)
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--no-sandbox")
 
-    driver_service = Service(ChromeDriverManager().install())
+    reddit = praw.Reddit(
+        client_id=os.getenv("PRAW_CLIENT_ID"),
+        client_secret=os.getenv("PRAW_CLIENT_SECRET"),
+        user_agent=os.getenv("PRAW_USER_AGENT"),
+    )
+    subreddit_name = "WouldYouRather"
+    pages_to_scrape = 100
+    posts_per_page = 100
 
-    # Launch the browser
-    driver = webdriver.Chrome(service=driver_service, options=chrome_options)
+    all_titles = []
+    subreddit = reddit.subreddit(subreddit_name)
 
-    # Navigate to the Reddit URL
-    driver.get('https://www.reddit.com/r/WouldYouRather/')
+    for _ in range(pages_to_scrape):
+        posts = subreddit.hot(limit=posts_per_page)
 
-    last_height = driver.execute_script("return document.body.scrollHeight")
-    while True:
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(2)  # Give time for the new content to load
-        new_height = driver.execute_script("return document.body.scrollHeight")
-        if new_height == last_height:
-            break
-        last_height = new_height
+        for post in posts:
+            all_titles.append(post.title)
 
-    # Get the rendered HTML content
-    content = driver.page_source
-
-    # Close the browser
-    driver.quit()
-
-    # Now, parse the content with BeautifulSoup
-    soup = BeautifulSoup(content, 'html.parser')
-
-    blocked = soup.find_all('div', class_='font-bold text-24 text-neutral-content-strong')
-    if len(blocked) > 0:
-        print('Blocked by reddit network security')
-    # Use a generic selector that is likely to be stable
-    # The new selector is likely a class or data attribute on the title elements
-    all_titles = soup.find_all('a', attrs={'slot': 'title'})
-
-    if all_titles:
-        for title in all_titles:
-            print(title.text.strip())
-    else:
-        print("No post titles found.")
+    for title in all_titles:
+        print(title)
 
 
+#
